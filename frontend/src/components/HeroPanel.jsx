@@ -1,8 +1,8 @@
 const HeroPanel = ({ onLoadSample }) => (
-  <section className="panel hero-panel">
+  <header className="panel hero-panel">
     <div className="hero-copy">
       <div className="eyebrow">Civic-grade review workflow</div>
-      <h1>Turn real-world bugs into real-world action.</h1>
+      <h1 id="page-title">Put your code on trial.</h1>
       <p className="hero-text">
         Review fragile logic, surface the root cause, and move from detection to decision in one trusted workflow.
       </p>
@@ -64,7 +64,7 @@ const HeroPanel = ({ onLoadSample }) => (
         </div>
       </div>
     </div>
-  </section>
+  </header>
 )
 
 export default HeroPanel

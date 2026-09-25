@@ -8,6 +8,25 @@ const simulateAnalysis = (code) => {
 
   const isBuggy = /cart\s*=\s*\[\]|cart\s*=\s*\[]/.test(code) || /return\s+cart/.test(code)
 
+  const evidence = [
+    {
+      line: 3,
+      label: 'State mutation during checkout',
+      description:
+        'The cart array is reassigned directly inside checkout(), which mutates the shared object reference and can clear state unexpectedly during purchase handling.',
+      severity: 'Critical',
+      confidence: 96,
+    },
+    {
+      line: 8,
+      label: 'Return value exposes mutable state',
+      description:
+        'The function returns the original cart reference instead of a defensive copy, allowing external callers to mutate the same instance.',
+      severity: 'Major',
+      confidence: 89,
+    },
+  ]
+
   const transcript = [
     {
       speaker: 'Prosecutor',
@@ -43,6 +62,7 @@ const simulateAnalysis = (code) => {
 
   return {
     success: true,
+    evidence,
     transcript,
     verdict,
   }

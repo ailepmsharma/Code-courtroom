@@ -1,5 +1,11 @@
-const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, isValid, overLimit }) => (
-  <section id="input-section" className="panel input-panel">
+const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, isValid, overLimit, textareaRef }) => (
+  <form
+    className="panel input-panel"
+    onSubmit={(event) => {
+      event.preventDefault()
+      onSubmit()
+    }}
+  >
     <div className="section-header-row">
       <div>
         <div className="eyebrow subtle">Exhibit A</div>
@@ -21,6 +27,7 @@ const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, 
       Evidence to review
     </label>
     <textarea
+      ref={textareaRef}
       id="code-input"
       value={code}
       onChange={(event) => onCodeChange(event.target.value)}
@@ -28,11 +35,15 @@ const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, 
       aria-describedby="code-help"
     />
 
+    <p id="code-help" className="sr-only">
+      Paste a code snippet you would like examined for bugs or risky behavior.
+    </p>
+
     <div className="input-meta">
-      <div id="code-help" className={`field-hint ${!isValid ? 'visible' : ''}`}>
+      <div className={`field-hint ${!isValid ? 'visible' : ''}`} aria-hidden={isValid}>
         Add some code before you put it on trial
       </div>
-      <div className={`counter ${overLimit ? 'warning' : ''}`}>{code.length} chars</div>
+      <div id="code-count" className={`counter ${overLimit ? 'warning' : ''}`}>{code.length} chars</div>
     </div>
 
     {overLimit && (
@@ -42,11 +53,11 @@ const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, 
     )}
 
     <div className="submit-row">
-      <button type="button" className="primary-button" disabled={!isValid || isSubmitting} onClick={onSubmit}>
+      <button type="submit" className="primary-button" disabled={!isValid || isSubmitting}>
         {isSubmitting ? 'Reviewing evidence...' : 'Put It On Trial ⚖️'}
       </button>
     </div>
-  </section>
+  </form>
 )
 
 export default InputPanel

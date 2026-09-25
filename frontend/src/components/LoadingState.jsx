@@ -1,5 +1,5 @@
 const LoadingState = () => (
-  <div className="loading-state" role="status" aria-live="polite">
+  <div className="loading-state" aria-hidden="true">
     <span className="spinner" aria-hidden="true" />
     <div>
       <strong>Analyzing submitted code...</strong>
