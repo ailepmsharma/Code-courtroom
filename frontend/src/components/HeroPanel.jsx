@@ -1,10 +1,10 @@
 const HeroPanel = ({ onLoadSample }) => (
   <header className="panel hero-panel">
     <div className="hero-copy">
-      <div className="eyebrow">Civic-grade review workflow</div>
+      <div className="eyebrow">AI-assisted code examination</div>
       <h1 id="page-title">Put your code on trial.</h1>
       <p className="hero-text">
-        Review fragile logic, surface the root cause, and move from detection to decision in one trusted workflow.
+        Submit a code sample. Hear both sides of the argument. Leave with a clear, actionable ruling.
       </p>
 
       <div className="hero-actions">
@@ -16,51 +16,42 @@ const HeroPanel = ({ onLoadSample }) => (
         </button>
       </div>
 
-      <div className="hero-metrics" aria-label="Platform metrics">
-        <div>
-          <strong>94%</strong>
-          <span>Issue detection</span>
-        </div>
-        <div>
-          <strong>2.4s</strong>
-          <span>Average review</span>
-        </div>
-        <div>
-          <strong>11k</strong>
-          <span>Cases reviewed</span>
-        </div>
+      <div className="hero-process" aria-label="Review process">
+        <span>Evidence</span>
+        <span aria-hidden="true" />
+        <span>Arguments</span>
+        <span aria-hidden="true" />
+        <span>Ruling</span>
       </div>
     </div>
 
-    <div className="hero-visual" aria-label="Case overview preview">
-      <div className="mini-panel">
-        <div className="mini-header">
-          <span className="status-dot" aria-hidden="true" />
-          <span>Case pulse</span>
+    <div className="hero-visual" aria-label="Courtroom review stages">
+      <div className="docket-sheet">
+        <div className="docket-heading">
+          <span>REVIEW PROTOCOL</span>
+          <span>CC / 001</span>
         </div>
 
-        <div className="mini-bars" aria-hidden="true">
-          <span style={{ height: '32%' }} />
-          <span style={{ height: '58%' }} />
-          <span style={{ height: '81%' }} />
-          <span style={{ height: '66%' }} />
-          <span style={{ height: '91%' }} />
-          <span style={{ height: '77%' }} />
+        <div className="docket-stage">
+          <span>01</span>
+          <div>
+            <strong>Examine the evidence</strong>
+            <small>Trace behavior and identify risk</small>
+          </div>
         </div>
-      </div>
-
-      <div className="mini-summary">
-        <div className="summary-line">
-          <span>Critical risk</span>
-          <span className="risk-pill">High</span>
+        <div className="docket-stage">
+          <span>02</span>
+          <div>
+            <strong>Hear both arguments</strong>
+            <small>Compare prosecution and defense</small>
+          </div>
         </div>
-        <div className="summary-line">
-          <span>Root cause</span>
-          <span>State mutation</span>
-        </div>
-        <div className="summary-line">
-          <span>Recommendation</span>
-          <span>Clone before reset</span>
+        <div className="docket-stage">
+          <span>03</span>
+          <div>
+            <strong>Deliver a ruling</strong>
+            <small>Get a reasoned next step</small>
+          </div>
         </div>
       </div>
     </div>

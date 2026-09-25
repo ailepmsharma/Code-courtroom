@@ -9,7 +9,7 @@ const VerdictCard = ({ verdict }) => (
     </div>
 
     {verdict ? (
-      <div className="verdict-card">
+      <div className={`verdict-card ${verdict.status === 'Issue found' ? 'verdict-result-issue' : 'verdict-result-clear'}`}>
         <div className="verdict-header">
           <span className="verdict-status">{verdict.status}</span>
           <strong>{verdict.verdict}</strong>
@@ -20,11 +20,11 @@ const VerdictCard = ({ verdict }) => (
         <div className="verdict-grid">
           <div className="verdict-box">
             <span>Detected</span>
-            <strong>State mutation</strong>
+            <strong>{verdict.status === 'Issue found' ? 'State mutation' : 'No critical findings'}</strong>
           </div>
           <div className="verdict-box">
             <span>Impact</span>
-            <strong>Checkout breakage</strong>
+            <strong>{verdict.status === 'Issue found' ? 'Checkout breakage' : 'No release blocker'}</strong>
           </div>
         </div>
 
