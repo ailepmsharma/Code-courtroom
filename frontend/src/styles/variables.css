@@ -10,22 +10,17 @@
   --color-warning: #f0b168;
   --color-error: #ef6d6d;
 
-  --color-bg: #0b0d10;
-  --color-bg-elevated: #121821;
-  --color-panel: rgba(18, 24, 33, 0.92);
+  --color-bg: var(--color-background);
+  --color-bg-elevated: var(--color-surface-elevated);
+  --color-panel: var(--color-surface);
   --color-panel-strong: rgba(14, 18, 25, 0.98);
-  --color-surface: rgba(255, 255, 255, 0.02);
   --color-surface-strong: rgba(255, 255, 255, 0.04);
-  --color-border: rgba(168, 180, 193, 0.15);
-  --color-text: #edf2f7;
-  --color-text-muted: #a6b1bf;
-  --color-accent: #d4ad6e;
+  --color-text: var(--color-text-primary);
+  --color-text-muted: var(--color-text-secondary);
   --color-accent-soft: rgba(212, 173, 110, 0.16);
   --color-prosecutor: #e36562;
   --color-defense: #6ea5ed;
-  --color-success: #67d4a3;
-  --color-warning: #f0b168;
-  --color-danger: #ef6d6d;
+  --color-danger: var(--color-error);
   --color-shadow: rgba(2, 6, 12, 0.45);
 
   --space-1: 4px;
@@ -45,6 +40,13 @@
   --space-lg: var(--space-6);
   --space-xl: var(--space-8);
 
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.5rem;
+  --text-display: 4.25rem;
+
   --radius-sm: 10px;
   --radius-md: 16px;
   --radius-lg: 24px;
@@ -53,9 +55,9 @@
   --shadow-soft: 0 24px 42px rgba(0, 0, 0, 0.28);
   --shadow-card: 0 16px 28px rgba(0, 0, 0, 0.18);
 
-  --font-sans: 'Inter', 'Segoe UI', sans-serif;
+  --font-sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
   --font-display: 'Fraunces', Georgia, serif;
-  --font-mono: 'JetBrains Mono', 'SFMono-Regular', monospace;
+  --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
 
   --duration-fast: 150ms;
   --duration-normal: 220ms;

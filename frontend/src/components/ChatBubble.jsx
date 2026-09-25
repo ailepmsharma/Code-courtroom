@@ -1,8 +1,8 @@
 const ChatBubble = ({ speaker, side, text }) => (
-  <div className={`speech-bubble ${side}`}>
+  <article className={`speech-bubble ${side}`} aria-label={`${speaker} statement`}>
     <span className="speaker-tag">{speaker}</span>
     <p>{text}</p>
-  </div>
+  </article>
 )
 
 export default ChatBubble

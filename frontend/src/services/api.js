@@ -6,7 +6,7 @@ const simulateAnalysis = (code) => {
     }
   }
 
-  const isBuggy = /cart\s*=\s*\[\]|cart\s*=\s*\[]/.test(code) || /return\s+cart/.test(code)
+  const isBuggy = /(?:^|[;{}\n])\s*cart\s*=\s*\[\]/.test(code) || /return\s+cart\b/.test(code)
 
   const evidence = [
     {
@@ -27,7 +27,7 @@ const simulateAnalysis = (code) => {
     },
   ]
 
-  const transcript = [
+  const transcript = isBuggy ? [
     {
       speaker: 'Prosecutor',
       side: 'prosecutor',
@@ -46,6 +46,25 @@ const simulateAnalysis = (code) => {
       text:
         'This is a clear state-management issue. The ruling favors a defensive clone and a reset that does not mutate shared references.',
     },
+  ] : [
+    {
+      speaker: 'Prosecutor',
+      side: 'prosecutor',
+      text:
+        'The checkout flow takes a defensive copy before clearing the cart, preserving the live collection for other callers.',
+    },
+    {
+      speaker: 'Defense',
+      side: 'defense',
+      text:
+        'The empty-cart guard and copied order snapshot keep the checkout path predictable without exposing shared state.',
+    },
+    {
+      speaker: 'Judge',
+      side: 'judge',
+      text:
+        'No critical state leak is apparent in this sample. The defensive copy keeps the cart boundary intact through checkout.',
+    },
   ]
 
   const verdict = {
@@ -62,7 +81,7 @@ const simulateAnalysis = (code) => {
 
   return {
     success: true,
-    evidence,
+    evidence: isBuggy ? evidence : [],
     transcript,
     verdict,
   }
