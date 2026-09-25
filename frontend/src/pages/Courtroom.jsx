@@ -12,6 +12,7 @@ const Courtroom = () => {
   const [code, setCode] = useState(buggyCodeSample)
   const [transcript, setTranscript] = useState([])
   const [verdict, setVerdict] = useState(null)
+  const [evidence, setEvidence] = useState([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
   const textareaRef = useRef(null)
@@ -24,6 +25,7 @@ const Courtroom = () => {
     setCode(nextCode)
     setTranscript([])
     setVerdict(null)
+    setEvidence([])
     setError('')
 
     requestAnimationFrame(() => {
@@ -41,6 +43,7 @@ const Courtroom = () => {
     setIsSubmitting(true)
     setTranscript([])
     setVerdict(null)
+    setEvidence([])
 
     try {
       const result = await analyzeCase(code)
@@ -51,6 +54,7 @@ const Courtroom = () => {
       }
 
       setTranscript(result.transcript)
+      setEvidence(result.evidence)
       setVerdict(result.verdict)
 
       requestAnimationFrame(() => {
@@ -71,24 +75,34 @@ const Courtroom = () => {
       <Header />
 
       <main className="page-shell">
-        <HeroPanel onLoadSample={loadSample} />
+        <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+          {isSubmitting ? 'Analyzing your case…' : ''}
+        </p>
 
-        <InputPanel
-          code={code}
-          onCodeChange={setCode}
-          onSubmit={handleSubmit}
-          onLoadSample={loadSample}
-          isSubmitting={isSubmitting}
-          isValid={isValid}
-          overLimit={overLimit}
-        />
+        <section id="input-section" className="input-section" aria-labelledby="page-title">
+          <HeroPanel onLoadSample={loadSample} />
+          <InputPanel
+            code={code}
+            onCodeChange={setCode}
+            onSubmit={handleSubmit}
+            onLoadSample={loadSample}
+            isSubmitting={isSubmitting}
+            isValid={isValid}
+            overLimit={overLimit}
+            textareaRef={textareaRef}
+          />
+          <ErrorBanner message={error} />
+        </section>
 
-        {error && <ErrorBanner message={error} />}
-
-        <TranscriptView transcript={transcript} isSubmitting={isSubmitting} />
+        <TranscriptView transcript={transcript} evidence={evidence} isSubmitting={isSubmitting} />
 
         <VerdictCard verdict={verdict} />
       </main>
+
+      <footer className="site-footer">
+        <span>CODE COURTROOM</span>
+        <span>Code review preview · Built for careful examination</span>
+      </footer>
     </div>
   )
 }
