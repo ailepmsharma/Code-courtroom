@@ -1,0 +1,50 @@
+:root {
+  --color-bg: #0b0d10;
+  --color-bg-elevated: #121821;
+  --color-panel: rgba(18, 24, 33, 0.92);
+  --color-panel-strong: rgba(14, 18, 25, 0.98);
+  --color-surface: rgba(255, 255, 255, 0.02);
+  --color-surface-strong: rgba(255, 255, 255, 0.04);
+  --color-border: rgba(168, 180, 193, 0.15);
+  --color-text: #edf2f7;
+  --color-text-muted: #a6b1bf;
+  --color-accent: #d4ad6e;
+  --color-accent-soft: rgba(212, 173, 110, 0.16);
+  --color-prosecutor: #e36562;
+  --color-defense: #6ea5ed;
+  --color-success: #67d4a3;
+  --color-warning: #f0b168;
+  --color-danger: #ef6d6d;
+  --color-shadow: rgba(2, 6, 12, 0.45);
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 30px;
+
+  --shadow-soft: 0 24px 42px rgba(0, 0, 0, 0.28);
+  --shadow-card: 0 16px 28px rgba(0, 0, 0, 0.18);
+
+  --font-sans: 'Inter', 'Segoe UI', sans-serif;
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-mono: 'JetBrains Mono', 'SFMono-Regular', monospace;
+
+  --duration-fast: 150ms;
+  --duration-normal: 220ms;
+  --duration-slow: 300ms;
+
+  --z-dropdown: 10;
+  --z-sticky: 20;
+  --z-modal: 30;
+}
