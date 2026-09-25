@@ -1,10 +1,10 @@
 const HeroPanel = ({ onLoadSample }) => (
   <header className="panel hero-panel">
     <div className="hero-copy">
-      <div className="eyebrow">AI-assisted code examination</div>
+      <div className="eyebrow">Interactive demo · Local rule-based review</div>
       <h1 id="page-title">Put your code on trial.</h1>
       <p className="hero-text">
-        Submit a code sample. Hear both sides of the argument. Leave with a clear, actionable ruling.
+        Explore how a code review can work: submit evidence, hear both arguments, then examine a reasoned ruling.
       </p>
 
       <div className="hero-actions">

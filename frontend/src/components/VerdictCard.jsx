@@ -5,11 +5,11 @@ const VerdictCard = ({ verdict }) => (
         <div className="eyebrow subtle">Final ruling</div>
         <h2 id="verdict-heading">Verdict</h2>
       </div>
-      {verdict && <span className="score-pill">{verdict.score}/100</span>}
+      {verdict && <span className="score-pill">{verdict.score === null ? 'Unscored' : `${verdict.score}/100`}</span>}
     </div>
 
     {verdict ? (
-      <div className={`verdict-card ${verdict.status === 'Issue found' ? 'verdict-result-issue' : 'verdict-result-clear'}`}>
+      <div className={`verdict-card verdict-result-${verdict.resultType}`}>
         <div className="verdict-header">
           <span className="verdict-status">{verdict.status}</span>
           <strong>{verdict.verdict}</strong>
@@ -20,11 +20,11 @@ const VerdictCard = ({ verdict }) => (
         <div className="verdict-grid">
           <div className="verdict-box">
             <span>Detected</span>
-            <strong>{verdict.status === 'Issue found' ? 'State mutation' : 'No critical findings'}</strong>
+            <strong>{verdict.detected}</strong>
           </div>
           <div className="verdict-box">
             <span>Impact</span>
-            <strong>{verdict.status === 'Issue found' ? 'Checkout breakage' : 'No release blocker'}</strong>
+            <strong>{verdict.impact}</strong>
           </div>
         </div>
 

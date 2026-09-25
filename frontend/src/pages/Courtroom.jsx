@@ -101,7 +101,7 @@ const Courtroom = () => {
 
       <footer className="site-footer">
         <span>CODE COURTROOM</span>
-        <span>Code review preview · Built for careful examination</span>
+        <span>Local rule-based demo · No AI model or backend connected</span>
       </footer>
     </div>
   )

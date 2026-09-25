@@ -25,7 +25,7 @@ const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, 
           <div className="eyebrow subtle">Exhibit A</div>
           <h2>Submit evidence</h2>
         </div>
-        <span className="language-pill">Auto-detect</span>
+        <span className="language-pill">Cart-flow demo</span>
       </div>
 
       <div className="quick-samples" aria-label="Sample code quick-fill options">
