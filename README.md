@@ -1,20 +1,34 @@
-<<<<<<< HEAD
-# React + Vite
+# Code Courtroom
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Code Courtroom is an interactive prototype for examining code through a courtroom-style review: submit a snippet, read the arguments, inspect findings, and consider a ruling.
 
-Currently, two official plugins are available:
+## Run locally
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+The active application is in `frontend/`.
 
-## React Compiler
+```powershell
+cd frontend
+npm install
+npm run dev
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Run the frontend checks from the same directory:
 
-## Expanding the Oxlint configuration
+```powershell
+npm run build
+npm run lint
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
-=======
-# pvt.code-courtroom.hackathon
->>>>>>> origin/main
+## Current scope
+
+The current experience is a local, rule-based demo for a curated cart-checkout example. It does not connect to an AI model or backend service and should not be used as a production code-security review. Unsupported snippets receive an unscored “Limited demo” result rather than an approval.
+
+The Express package under `backend/` is a scaffold and is not currently wired to the frontend.
+
+## Project structure
+
+- `frontend/src/pages/Courtroom.jsx` coordinates the sample review flow and page state.
+- `frontend/src/components/` contains the courtroom interface components.
+- `frontend/src/services/api.js` holds the local demo analysis contract.
+- `frontend/src/data/sampleCode.js` contains the curated buggy and clean examples.
+- `backend/server.js` is currently an empty backend entry point.

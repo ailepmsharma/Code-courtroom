@@ -753,6 +753,12 @@ textarea:focus {
   color: #a7e9cd;
 }
 
+.verdict-result-review .verdict-status {
+  background: rgba(240, 177, 104, 0.12);
+  border-color: rgba(240, 177, 104, 0.3);
+  color: #f3d5a5;
+}
+
 .verdict-header strong {
   display: block;
   max-width: 26ch;
