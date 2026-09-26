@@ -1,3 +1,4 @@
+// Local frontend demo fixtures; the backend has no B34/B35 sample contract yet.
 export const buggyCodeSample = `const cart = [];
 
 function addToCart(item) {
