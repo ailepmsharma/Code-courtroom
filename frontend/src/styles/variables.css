@@ -59,6 +59,15 @@
   --font-display: 'Fraunces', Georgia, serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
 
+  --content-width: 840px;
+  --content-gutter: 24px;
+  --color-ink: #080a0d;
+  --color-ivory: #f2eee5;
+  --color-brass-bright: #e5c27d;
+  --color-prosecutor-soft: rgba(227, 101, 98, 0.08);
+  --color-defense-soft: rgba(110, 165, 237, 0.08);
+  --shadow-editorial: 0 28px 70px rgba(0, 0, 0, 0.26);
+
   --duration-fast: 150ms;
   --duration-normal: 220ms;
   --duration-slow: 300ms;

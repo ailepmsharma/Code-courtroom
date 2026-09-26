@@ -10,6 +10,11 @@ const VerdictCard = ({ verdict }) => (
 
     {verdict ? (
       <div className={`verdict-card verdict-result-${verdict.resultType}`}>
+        <div className="ruling-seal" aria-hidden="true">
+          <svg viewBox="0 0 40 40" fill="none" focusable="false">
+            <path d="M20 6v24M11 11h18M20 9l-8 13m8-13 8 13M8 22h8c-.5 3.2-2 5-4 5s-3.5-1.8-4-5Zm16 0h8c-.5 3.2-2 5-4 5s-3.5-1.8-4-5ZM14 33h12" />
+          </svg>
+        </div>
         <div className="verdict-header">
           <span className="verdict-status">{verdict.status}</span>
           <strong>{verdict.verdict}</strong>
