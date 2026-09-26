@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
+import { detectLanguage, languageOptions } from '../data/languages.js'
 
-const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, isValid, overLimit, textareaRef }) => {
+const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, isValid, overLimit, textareaRef, language, onLanguageChange }) => {
   const [copyFeedback, setCopyFeedback] = useState('')
   const [showEmptyHint, setShowEmptyHint] = useState(false)
   const [attemptFeedback, setAttemptFeedback] = useState('')
@@ -9,6 +10,11 @@ const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, 
   const attemptTimeoutRef = useRef(null)
   const sampleFeedbackTimeoutRef = useRef(null)
   const lineCount = code.trim() ? code.split(/\r\n|\r|\n/).length : 0
+  const detectedLanguage = detectLanguage(code)
+  const selectedLanguage = languageOptions.find((option) => option.value === language) ?? languageOptions[0]
+  const languageStatus = language === 'auto'
+    ? `Auto-detect · ${code.trim() ? detectedLanguage?.label ?? 'Unspecified' : 'Unspecified'}`
+    : selectedLanguage.label
 
   useEffect(() => () => {
     window.clearTimeout(attemptTimeoutRef.current)
@@ -69,7 +75,20 @@ const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, 
           <div className="eyebrow subtle">Evidence file · 01</div>
           <h2>Code evidence</h2>
         </div>
-        <span className="language-pill">Cart-flow demo</span>
+        <div className="language-control">
+          <label className="language-control-label" htmlFor="language-select">Review language</label>
+          <select
+            id="language-select"
+            className="language-select"
+            value={language}
+            onChange={(event) => onLanguageChange(event.target.value)}
+            disabled={isSubmitting}
+          >
+            {languageOptions.map((option) => (
+              <option key={option.value} value={option.value}>{option.label}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div className="quick-samples" aria-label="Sample code quick-fill options">
@@ -88,6 +107,7 @@ const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, 
           <div className="editor-heading">
             <span className="editor-led" aria-hidden="true" />
             <label htmlFor="code-input" className="editor-label">Exhibit A · Source code</label>
+            <span className="language-status" aria-live="polite">Language · {languageStatus}</span>
           </div>
           <button type="button" className="copy-button" onClick={handleCopy} disabled={!isValid} aria-live="polite">
             {copyFeedback || 'Copy code'}

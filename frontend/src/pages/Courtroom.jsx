@@ -7,6 +7,7 @@ import VerdictCard from '../components/VerdictCard'
 import ErrorBanner from '../components/ErrorBanner'
 import { analyzeCase } from '../services/api'
 import { buggyCodeSample, cleanCodeSample } from '../data/sampleCode.js'
+import { getLanguageHint } from '../data/languages.js'
 
 const Courtroom = () => {
   const [code, setCode] = useState('')
@@ -15,6 +16,7 @@ const Courtroom = () => {
   const [evidence, setEvidence] = useState([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [language, setLanguage] = useState('auto')
   const textareaRef = useRef(null)
 
   const isValid = code.trim().length > 0
@@ -46,7 +48,7 @@ const Courtroom = () => {
     setEvidence([])
 
     try {
-      const result = await analyzeCase(code)
+      const result = await analyzeCase(code, getLanguageHint(code, language))
 
       if (!result.success) {
         setError(result.error)
@@ -90,6 +92,8 @@ const Courtroom = () => {
             isValid={isValid}
             overLimit={overLimit}
             textareaRef={textareaRef}
+            language={language}
+            onLanguageChange={setLanguage}
           />
           <ErrorBanner message={error} />
         </section>

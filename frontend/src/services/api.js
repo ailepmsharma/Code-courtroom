@@ -120,7 +120,10 @@ const simulateAnalysis = (code) => {
   }
 }
 
-export const analyzeCase = async (code) => {
+export const analyzeCase = async (code, languageHint = { language: 'auto', detected: false }) => {
   await new Promise((resolve) => setTimeout(resolve, 800))
-  return simulateAnalysis(code)
+  return {
+    ...simulateAnalysis(code),
+    languageHint,
+  }
 }
