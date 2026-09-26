@@ -9,7 +9,7 @@ import { analyzeCase } from '../services/api'
 import { buggyCodeSample, cleanCodeSample } from '../data/sampleCode.js'
 
 const Courtroom = () => {
-  const [code, setCode] = useState(buggyCodeSample)
+  const [code, setCode] = useState('')
   const [transcript, setTranscript] = useState([])
   const [verdict, setVerdict] = useState(null)
   const [evidence, setEvidence] = useState([])
