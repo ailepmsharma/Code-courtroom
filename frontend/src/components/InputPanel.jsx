@@ -2,6 +2,7 @@ import { useState } from 'react'
 
 const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, isValid, overLimit, textareaRef }) => {
   const [copyFeedback, setCopyFeedback] = useState('')
+  const lineCount = code.trim() ? code.split(/\r\n|\r|\n/).length : 0
 
   const handleCopy = async () => {
     try {
@@ -22,8 +23,8 @@ const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, 
     >
       <div className="section-header-row">
         <div>
-          <div className="eyebrow subtle">Exhibit A</div>
-          <h2>Submit evidence</h2>
+          <div className="eyebrow subtle">Evidence file · 01</div>
+          <h2>Code evidence</h2>
         </div>
         <span className="language-pill">Cart-flow demo</span>
       </div>
@@ -39,7 +40,10 @@ const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, 
 
       <div className="code-workbench">
         <div className="code-toolbar">
-          <label htmlFor="code-input" className="editor-label">Code under review</label>
+          <div className="editor-heading">
+            <span className="editor-led" aria-hidden="true" />
+            <label htmlFor="code-input" className="editor-label">Exhibit A · Source code</label>
+          </div>
           <button type="button" className="copy-button" onClick={handleCopy} disabled={!isValid} aria-live="polite">
             {copyFeedback || 'Copy code'}
           </button>
@@ -56,18 +60,23 @@ const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, 
           placeholder="// Paste the code you'd like to put on trial…"
           aria-describedby="code-help code-count"
           spellCheck="false"
+          disabled={isSubmitting}
         />
+        <div className="code-footer">
+          <div id="code-count" className={`counter ${overLimit ? 'warning' : ''}`}>
+            {lineCount} {lineCount === 1 ? 'line' : 'lines'} · {code.length} chars
+          </div>
+        </div>
       </div>
 
-      <p id="code-help" className="sr-only">
-        Paste a code snippet you would like examined for bugs or risky behavior.
+      <p id="code-help" className="code-instructions">
+        Paste a snippet for examination. This demo currently reviews cart-checkout patterns.
       </p>
 
       <div className="input-meta">
-        <div className={`field-hint ${!isValid ? 'visible' : ''}`} aria-hidden={isValid}>
+        <div id="code-empty-hint" className={`field-hint ${!isValid ? 'visible' : ''}`} aria-hidden={isValid}>
           Add some code before you put it on trial
         </div>
-        <div id="code-count" className={`counter ${overLimit ? 'warning' : ''}`}>{code.length} chars</div>
       </div>
 
       {overLimit && (
@@ -77,7 +86,12 @@ const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, 
       )}
 
       <div className="submit-row">
-        <button type="submit" className="primary-button" disabled={!isValid || isSubmitting}>
+        <button
+          type="submit"
+          className="primary-button"
+          disabled={!isValid || isSubmitting}
+          aria-describedby={!isValid ? 'code-empty-hint' : undefined}
+        >
           {isSubmitting ? 'Reviewing evidence...' : 'Put It On Trial ⚖️'}
         </button>
       </div>
