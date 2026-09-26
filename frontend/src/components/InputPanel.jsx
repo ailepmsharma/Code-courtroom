@@ -4,10 +4,16 @@ const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, 
   const [copyFeedback, setCopyFeedback] = useState('')
   const [showEmptyHint, setShowEmptyHint] = useState(false)
   const [attemptFeedback, setAttemptFeedback] = useState('')
+  const [sampleFeedback, setSampleFeedback] = useState('')
+  const [sampleHighlight, setSampleHighlight] = useState('')
   const attemptTimeoutRef = useRef(null)
+  const sampleFeedbackTimeoutRef = useRef(null)
   const lineCount = code.trim() ? code.split(/\r\n|\r|\n/).length : 0
 
-  useEffect(() => () => window.clearTimeout(attemptTimeoutRef.current), [])
+  useEffect(() => () => {
+    window.clearTimeout(attemptTimeoutRef.current)
+    window.clearTimeout(sampleFeedbackTimeoutRef.current)
+  }, [])
 
   const handleEmptyAttempt = () => {
     if (isValid || isSubmitting) {
@@ -40,6 +46,19 @@ const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, 
     }
   }
 
+  const handleSampleLoad = (variant) => {
+    onLoadSample(variant)
+    setCopyFeedback('')
+    setShowEmptyHint(false)
+    setSampleHighlight(variant)
+    setSampleFeedback(variant === 'buggy' ? 'Buggy sample loaded' : 'Clean sample loaded')
+    window.clearTimeout(sampleFeedbackTimeoutRef.current)
+    sampleFeedbackTimeoutRef.current = window.setTimeout(() => {
+      setSampleFeedback('')
+      setSampleHighlight('')
+    }, 1800)
+  }
+
   return (
     <form
       className="panel input-panel"
@@ -54,15 +73,17 @@ const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, 
       </div>
 
       <div className="quick-samples" aria-label="Sample code quick-fill options">
-        <button type="button" className="sample-button" onClick={() => onLoadSample('buggy')}>
-          Try Buggy Code 🐛
+        <button type="button" className="sample-button" onClick={() => handleSampleLoad('buggy')}>
+          <span className="sample-glyph" aria-hidden="true">🐛</span>
+          <span>Try Buggy Code</span>
         </button>
-        <button type="button" className="sample-button" onClick={() => onLoadSample('clean')}>
-          Try Clean Code ✨
+        <button type="button" className="sample-button" onClick={() => handleSampleLoad('clean')}>
+          <span className="sample-glyph" aria-hidden="true">✨</span>
+          <span>Try Clean Code</span>
         </button>
       </div>
 
-      <div className="code-workbench">
+      <div className={`code-workbench ${sampleHighlight ? 'sample-loaded' : ''}`}>
         <div className="code-toolbar">
           <div className="editor-heading">
             <span className="editor-led" aria-hidden="true" />
@@ -93,6 +114,9 @@ const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, 
           disabled={isSubmitting}
         />
         <div className="code-footer">
+          <span className="sample-feedback" role="status" aria-live="polite" aria-atomic="true">
+            {sampleFeedback}
+          </span>
           <div id="code-count" className={`counter ${overLimit ? 'warning' : ''}`}>
             {lineCount} {lineCount === 1 ? 'line' : 'lines'} · {code.length} chars
           </div>
