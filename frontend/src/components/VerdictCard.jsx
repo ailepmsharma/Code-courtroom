@@ -1,5 +1,5 @@
 const VerdictCard = ({ verdict }) => (
-  <section id="verdict-section" aria-labelledby="verdict-heading" className={`panel verdict-panel ${verdict ? 'is-visible' : ''}`}>
+  <section id="verdict-section" data-section="03" aria-labelledby="verdict-heading" className={`panel verdict-panel ${verdict ? 'is-visible' : ''}`}>
     <div className="section-header-row compact">
       <div>
         <div className="eyebrow subtle">Final ruling</div>

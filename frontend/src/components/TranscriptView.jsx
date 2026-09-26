@@ -3,7 +3,7 @@ import EvidencePanel from './EvidencePanel'
 import LoadingState from './LoadingState'
 
 const TranscriptView = ({ transcript, evidence, isSubmitting }) => (
-  <section id="transcript-section" aria-labelledby="transcript-heading" className={`panel transcript-panel ${transcript.length > 0 || isSubmitting ? 'is-visible' : ''}`}>
+  <section id="transcript-section" data-section="02" aria-labelledby="transcript-heading" className={`panel transcript-panel ${transcript.length > 0 || isSubmitting ? 'is-visible' : ''}`}>
     <div className="section-header-row compact">
       <div>
         <div className="eyebrow subtle">The Argument</div>
