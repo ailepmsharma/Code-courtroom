@@ -1,9 +1,10 @@
 const LoadingState = () => (
-  <div className="loading-state" aria-hidden="true">
-    <span className="spinner" aria-hidden="true" />
+  <div className="loading-state" role="status" aria-live="polite">
+    <span className="loading-seal" aria-hidden="true">§</span>
     <div>
-      <strong>Reviewing cart-state patterns…</strong>
-      <p>Local demo rules are checking the curated checkout example.</p>
+      <span className="loading-kicker">Proceedings underway</span>
+      <strong>Reviewing cart-state patterns<span className="loading-dots" aria-hidden="true">...</span></strong>
+      <p>Local rules are examining the submitted evidence.</p>
     </div>
   </div>
 )

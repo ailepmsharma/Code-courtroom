@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Header from '../components/Header'
 import HeroPanel from '../components/HeroPanel'
 import InputPanel from '../components/InputPanel'
@@ -21,6 +21,19 @@ const Courtroom = () => {
 
   const isValid = code.trim().length > 0
   const overLimit = code.length > 4000
+
+  useEffect(() => {
+    if (!verdict) {
+      return
+    }
+
+    requestAnimationFrame(() => {
+      document.getElementById('verdict-section')?.scrollIntoView({
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+        block: 'start',
+      })
+    })
+  }, [verdict])
 
   const loadSample = (variant) => {
     const nextCode = variant === 'buggy' ? buggyCodeSample : cleanCodeSample
@@ -81,7 +94,7 @@ const Courtroom = () => {
           {isSubmitting ? 'Analyzing your case…' : ''}
         </p>
 
-        <section id="input-section" className="input-section" aria-labelledby="page-title">
+        <section id="input-section" data-section="01" className="input-section" aria-labelledby="page-title">
           <HeroPanel onLoadSample={loadSample} />
           <InputPanel
             code={code}
