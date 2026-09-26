@@ -4,6 +4,10 @@ export const languageOptions = [
   { value: 'python', label: 'Python' },
   { value: 'java', label: 'Java' },
   { value: 'cpp', label: 'C++' },
+  { value: 'c', label: 'C' },
+  { value: 'typescript', label: 'TypeScript' },
+  { value: 'html', label: 'HTML' },
+  { value: 'css', label: 'CSS' },
 ]
 
 const languagePatterns = [
@@ -41,6 +45,30 @@ const languagePatterns = [
       /\bfunction\s+\w+\s*\(/,
       /=>|\bconsole\s*\.\s*log\s*\(/,
       /^\s*import\s+.+\s+from\s+["']/m,
+    ],
+  },
+  {
+    value: 'typescript',
+    patterns: [
+      /\binterface\s+\w+/,
+      /\btype\s+\w+\s*=/,
+      /:\s*(?:string|number|boolean|unknown|\w+\[\])/,
+    ],
+  },
+  {
+    value: 'html',
+    patterns: [
+      /<!doctype\s+html>/i,
+      /<html[\s>]/i,
+      /<body[\s>]/i,
+    ],
+  },
+  {
+    value: 'css',
+    patterns: [
+      /[.#][\w-]+\s*\{[^}]*:/,
+      /\b(?:display|position|color|margin|padding)\s*:/,
+      /@media\b/,
     ],
   },
 ]

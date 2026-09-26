@@ -1533,6 +1533,45 @@ textarea:disabled {
   }
 }
 
+/* Phase 2: evidence input interaction polish */
+.code-workbench {
+  position: relative;
+}
+
+.code-input {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 1.52em,
+    rgba(229, 194, 125, 0.045) 1.52em,
+    rgba(229, 194, 125, 0.045) calc(1.52em + 1px)
+  );
+  background-attachment: local;
+}
+
+.sample-button:disabled {
+  cursor: wait;
+  opacity: 0.45;
+  transform: none;
+}
+
+.copy-button:disabled {
+  border-color: rgba(214, 201, 176, 0.08);
+}
+
+.field-hint.visible {
+  animation: hint-arrive 180ms ease-out both;
+}
+
+.primary-button:disabled {
+  filter: saturate(0.7);
+}
+
+@keyframes hint-arrive {
+  from { opacity: 0; transform: translateY(-3px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* Premium courtroom finish */
 :root {
   --border: rgba(214, 201, 176, 0.16);

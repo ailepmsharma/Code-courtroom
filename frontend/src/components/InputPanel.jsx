@@ -3,7 +3,7 @@ import { detectLanguage, languageOptions } from '../data/languages.js'
 
 const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, isValid, overLimit, textareaRef, language, onLanguageChange }) => {
   const [copyFeedback, setCopyFeedback] = useState('')
-  const [showEmptyHint, setShowEmptyHint] = useState(false)
+  const [showEmptyHint, setShowEmptyHint] = useState(true)
   const [attemptFeedback, setAttemptFeedback] = useState('')
   const [sampleFeedback, setSampleFeedback] = useState('')
   const [sampleHighlight, setSampleHighlight] = useState('')
@@ -107,11 +107,11 @@ const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, 
       </div>
 
       <div className="quick-samples" aria-label="Sample code quick-fill options">
-        <button type="button" className="sample-button" onClick={() => handleSampleLoad('buggy')}>
+        <button type="button" className="sample-button" onClick={() => handleSampleLoad('buggy')} disabled={isSubmitting}>
           <span className="sample-glyph" aria-hidden="true">🐛</span>
           <span>Try Buggy Code</span>
         </button>
-        <button type="button" className="sample-button" onClick={() => handleSampleLoad('clean')}>
+        <button type="button" className="sample-button" onClick={() => handleSampleLoad('clean')} disabled={isSubmitting}>
           <span className="sample-glyph" aria-hidden="true">✨</span>
           <span>Try Clean Code</span>
         </button>
@@ -124,7 +124,7 @@ const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, 
             <label htmlFor="code-input" className="editor-label">Exhibit A · Source code</label>
             <span className="language-status" aria-live="polite">Language · {languageStatus}</span>
           </div>
-          <button type="button" className="copy-button" onClick={handleCopy} disabled={!isValid} aria-live="polite">
+          <button type="button" className="copy-button" onClick={handleCopy} disabled={!isValid || isSubmitting} aria-live="polite">
             {copyFeedback || 'Copy code'}
           </button>
         </div>
@@ -145,6 +145,7 @@ const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, 
           }}
           placeholder="// Paste the code you'd like to put on trial…"
           aria-describedby="code-help code-count code-empty-hint"
+          aria-invalid={showEmptyHint && !isValid}
           spellCheck="false"
           disabled={isSubmitting}
         />
@@ -184,7 +185,7 @@ const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, 
         <button
           type="submit"
           className={`primary-button ${attemptFeedback} ${submitFeedback}`}
-          disabled={isSubmitting}
+          disabled={!isValid || isSubmitting}
           aria-disabled={!isValid || isSubmitting}
           aria-describedby={!isValid ? 'code-empty-hint' : undefined}
           onFocus={() => {
@@ -197,7 +198,7 @@ const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, 
           <svg className="trial-mark" viewBox="0 0 40 40" fill="none" aria-hidden="true" focusable="false">
             <path d="M20 6v24M11 11h18M20 9l-8 13m8-13 8 13M8 22h8c-.5 3.2-2 5-4 5s-3.5-1.8-4-5Zm16 0h8c-.5 3.2-2 5-4 5s-3.5-1.8-4-5ZM14 33h12M17 30h6" />
           </svg>
-          <span>{isSubmitting ? 'Reviewing evidence...' : 'Put It On Trial'}</span>
+          <span>{isSubmitting ? 'Reviewing evidence...' : 'Put It On Trial ⚖️'}</span>
         </button>
       </div>
     </form>
