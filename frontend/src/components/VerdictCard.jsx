@@ -15,12 +15,18 @@ const VerdictCard = ({ verdict }) => (
             <path d="M20 6v24M11 11h18M20 9l-8 13m8-13 8 13M8 22h8c-.5 3.2-2 5-4 5s-3.5-1.8-4-5Zm16 0h8c-.5 3.2-2 5-4 5s-3.5-1.8-4-5ZM14 33h12" />
           </svg>
         </div>
+
         <div className="verdict-header">
           <span className="verdict-status">{verdict.status}</span>
           <strong>{verdict.verdict}</strong>
         </div>
 
         <p className="verdict-summary">{verdict.summary}</p>
+
+        <div className="reasoning-box">
+          <span>Reasoning</span>
+          <p>{verdict.reasoning ?? verdict.summary}</p>
+        </div>
 
         <div className="verdict-grid">
           <div className="verdict-box">
@@ -32,6 +38,14 @@ const VerdictCard = ({ verdict }) => (
             <strong>{verdict.impact}</strong>
           </div>
         </div>
+
+        {Array.isArray(verdict.sentence) && verdict.sentence.length > 0 && (
+          <ol className="sentence-list">
+            {verdict.sentence.map((sentence, index) => (
+              <li key={`${sentence}-${index}`}>{sentence}</li>
+            ))}
+          </ol>
+        )}
 
         <div className="recommendation-box">
           <span>Recommended action</span>

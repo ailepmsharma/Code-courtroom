@@ -9,12 +9,16 @@ import { analyzeCase } from '../services/api'
 import { buggyCodeSample, cleanCodeSample } from '../data/sampleCode.js'
 import { getLanguageHint } from '../data/languages.js'
 
+const wait = (duration) => new Promise((resolve) => window.setTimeout(resolve, duration))
+
 const Courtroom = () => {
   const [code, setCode] = useState('')
   const [transcript, setTranscript] = useState([])
+  const [trialSession, setTrialSession] = useState(0)
   const [verdict, setVerdict] = useState(null)
   const [evidence, setEvidence] = useState([])
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [loadingStage, setLoadingStage] = useState('')
   const [error, setError] = useState('')
   const [language, setLanguage] = useState('auto')
   const textareaRef = useRef(null)
@@ -28,7 +32,7 @@ const Courtroom = () => {
     }
 
     requestAnimationFrame(() => {
-      document.getElementById('verdict-section')?.scrollIntoView({
+      document.getElementById('transcript-section')?.scrollIntoView({
         behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
         block: 'start',
       })
@@ -42,6 +46,7 @@ const Courtroom = () => {
     setVerdict(null)
     setEvidence([])
     setError('')
+    setLoadingStage('')
 
     requestAnimationFrame(() => {
       textareaRef.current?.focus()
@@ -56,6 +61,8 @@ const Courtroom = () => {
 
     setError('')
     setIsSubmitting(true)
+    setTrialSession((current) => current + 1)
+    setLoadingStage('prosecutor')
     setTranscript([])
     setVerdict(null)
     setEvidence([])
@@ -75,12 +82,33 @@ const Courtroom = () => {
         return
       }
 
-      setTranscript(result.transcript)
-      setEvidence(result.evidence)
+      const trialTranscript = Array.isArray(result.transcript) ? result.transcript : []
+      const prosecutorEntry = trialTranscript.find((entry) => entry.side === 'prosecutor')
+      const defenseEntry = trialTranscript.find((entry) => entry.side === 'defense')
+      const judgeEntry = trialTranscript.find((entry) => entry.side === 'judge')
+      const revealDelay = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 90 : 620
+
+      setEvidence(Array.isArray(result.evidence) ? result.evidence : [])
+      setTranscript(prosecutorEntry ? [prosecutorEntry] : [])
+
+      if (defenseEntry) {
+        setLoadingStage('defense')
+        await wait(revealDelay)
+        setTranscript((current) => [...current, defenseEntry])
+      }
+
+      if (judgeEntry) {
+        setLoadingStage('judge')
+        await wait(revealDelay)
+        setTranscript((current) => [...current, judgeEntry])
+      }
+
+      setLoadingStage('')
       setVerdict(result.verdict)
     } catch {
       setError('Unable to analyze this case right now. Try again.')
     } finally {
+      setLoadingStage('')
       setIsSubmitting(false)
     }
   }
@@ -111,7 +139,7 @@ const Courtroom = () => {
           <ErrorBanner message={error} />
         </section>
 
-        <TranscriptView transcript={transcript} evidence={evidence} isSubmitting={isSubmitting} />
+        <TranscriptView key={trialSession} transcript={transcript} evidence={evidence} isSubmitting={isSubmitting} loadingStage={loadingStage} />
 
         <VerdictCard verdict={verdict} />
       </main>
