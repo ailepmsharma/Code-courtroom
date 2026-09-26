@@ -107,11 +107,11 @@ const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, 
       </div>
 
       <div className="quick-samples" aria-label="Sample code quick-fill options">
-        <button type="button" className="sample-button" onClick={() => handleSampleLoad('buggy')}>
+        <button type="button" className="sample-button" onClick={() => handleSampleLoad('buggy')} disabled={isSubmitting}>
           <span className="sample-glyph" aria-hidden="true">🐛</span>
           <span>Try Buggy Code</span>
         </button>
-        <button type="button" className="sample-button" onClick={() => handleSampleLoad('clean')}>
+        <button type="button" className="sample-button" onClick={() => handleSampleLoad('clean')} disabled={isSubmitting}>
           <span className="sample-glyph" aria-hidden="true">✨</span>
           <span>Try Clean Code</span>
         </button>
@@ -124,7 +124,7 @@ const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, 
             <label htmlFor="code-input" className="editor-label">Exhibit A · Source code</label>
             <span className="language-status" aria-live="polite">Language · {languageStatus}</span>
           </div>
-          <button type="button" className="copy-button" onClick={handleCopy} disabled={!isValid} aria-live="polite">
+          <button type="button" className="copy-button" onClick={handleCopy} disabled={!isValid || isSubmitting} aria-live="polite">
             {copyFeedback || 'Copy code'}
           </button>
         </div>
@@ -145,6 +145,7 @@ const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, 
           }}
           placeholder="// Paste the code you'd like to put on trial…"
           aria-describedby="code-help code-count code-empty-hint"
+          aria-invalid={showEmptyHint && !isValid}
           spellCheck="false"
           disabled={isSubmitting}
         />
@@ -184,7 +185,7 @@ const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, 
         <button
           type="submit"
           className={`primary-button ${attemptFeedback} ${submitFeedback}`}
-          disabled={isSubmitting}
+          disabled={!isValid || isSubmitting}
           aria-disabled={!isValid || isSubmitting}
           aria-describedby={!isValid ? 'code-empty-hint' : undefined}
           onFocus={() => {
