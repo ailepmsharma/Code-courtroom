@@ -60,6 +60,13 @@ const Courtroom = () => {
     setVerdict(null)
     setEvidence([])
 
+    requestAnimationFrame(() => {
+      document.getElementById('transcript-section')?.scrollIntoView({
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+        block: 'start',
+      })
+    })
+
     try {
       const result = await analyzeCase(code, getLanguageHint(code, language))
 
@@ -71,13 +78,6 @@ const Courtroom = () => {
       setTranscript(result.transcript)
       setEvidence(result.evidence)
       setVerdict(result.verdict)
-
-      requestAnimationFrame(() => {
-        document.getElementById('transcript-section')?.scrollIntoView({
-          behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
-          block: 'start',
-        })
-      })
     } catch {
       setError('Unable to analyze this case right now. Try again.')
     } finally {
