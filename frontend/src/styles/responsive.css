@@ -1,0 +1,275 @@
+@media (hover: hover) and (pointer: fine) {
+  .brand:hover .brand-mark,
+  .nav-link:hover,
+  .effects-toggle:hover,
+  .sample-button:hover,
+  .copy-button:hover:not(:disabled),
+  .secondary-link:hover,
+  .primary-link:hover,
+  .reset-trial-button:hover,
+  .trial-retry-button:hover {
+    transform: translateY(-2px);
+    border-color: var(--defense);
+    box-shadow: 0 6px 20px var(--defense-soft);
+  }
+
+  .primary-button:hover:not(:disabled):not([aria-disabled="true"]) {
+    transform: translateY(-3px);
+    box-shadow: 0 9px 0 var(--violet), 0 20px 45px var(--shadow-accent);
+  }
+}
+
+.reduce-effects {
+  --glass-blur: 0px;
+  scroll-behavior: auto;
+}
+
+html.tab-hidden * {
+  animation-play-state: paused !important;
+}
+
+.reduce-effects .intro-overlay,
+.reduce-effects .hero-docket,
+.reduce-effects .channel-wave i,
+.reduce-effects .status-pulse {
+  animation-duration: 1.5s;
+}
+
+.reduce-effects .intro-overlay {
+  animation-name: intro-exit;
+  animation-duration: 300ms;
+  animation-delay: 2.25s;
+}
+
+.reduce-effects .intro-overlay::after {
+  animation: none;
+}
+
+.reduce-effects .app-shell.gavel-strike {
+  animation-name: no-shake;
+}
+
+@media (max-width: 768px) {
+  .topbar {
+    align-items: flex-start;
+  }
+
+  .topbar-actions {
+    flex-wrap: wrap;
+  }
+
+  .speech-bubble {
+    max-width: 100%;
+  }
+
+  .courtroom-cast {
+    display: flex;
+    gap: 8px;
+    margin-right: -2px;
+    padding: 0 2px 8px;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scroll-snap-type: x mandatory;
+  }
+
+  .cast-character {
+    min-width: min(190px, 70vw);
+    flex: 0 0 min(190px, 70vw);
+    scroll-snap-align: start;
+  }
+
+  .site-footer {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-shell {
+    width: calc(100% - 24px);
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
+  }
+
+  .topbar {
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 14px;
+  }
+
+  .brand {
+    gap: 8px;
+  }
+
+  .brand-mark {
+    width: 40px;
+    height: 40px;
+    border-radius: 13px;
+  }
+
+  .brand-name {
+    font-size: 0.75rem;
+  }
+
+  .brand-tag {
+    font-size: 0.75rem;
+  }
+
+  .topbar-actions {
+    gap: 6px;
+  }
+
+  .nav-link {
+    min-height: 42px;
+    padding: 0 10px;
+    font-size: 0.78rem;
+  }
+
+  .effects-toggle {
+    min-width: 100px;
+    max-width: 112px;
+    padding: 2px 6px;
+  }
+
+  .effects-state { font-size: 0.7rem; }
+  .effects-hint { font-size: 0.6rem; }
+
+  .hero-process {
+    gap: 7px;
+    font-size: 0.72rem;
+  }
+
+  .section-header-row {
+    align-items: flex-start;
+  }
+
+  .section-header-row h2,
+  .section-header-row h3 {
+    font-size: 1.55rem;
+  }
+
+  .language-control-label {
+    max-width: 90px;
+    text-align: right;
+  }
+
+  .language-select {
+    width: min(150px, 42vw);
+    font-size: 0.88rem;
+  }
+
+  .code-toolbar {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .editor-heading {
+    width: calc(100% - 102px);
+  }
+
+  .language-status {
+    white-space: normal;
+  }
+
+  .copy-button {
+    min-width: 90px;
+  }
+
+  .fullscreen-button {
+    min-width: 100px;
+  }
+
+  .quick-samples {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sample-button {
+    padding: 0 9px;
+    font-size: 0.82rem;
+  }
+
+  .trial-progress {
+    gap: 6px;
+  }
+
+  .trial-progress-step {
+    padding: 9px 7px;
+  }
+
+  .trial-progress-label {
+    font-size: 0.82rem;
+    overflow-wrap: anywhere;
+  }
+
+  .trial-progress-status {
+    font-size: 0.74rem;
+  }
+
+  .transcript-role-tab {
+    padding: 0 11px;
+    font-size: 0.84rem;
+  }
+
+  .verdict-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .unscored-notice {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .trial-error {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .trial-error-actions {
+    align-self: flex-end;
+  }
+
+  .site-footer {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+@media (max-width: 360px) {
+  .topbar-actions .nav-link {
+    display: none;
+  }
+
+  .brand-tag {
+    display: none;
+  }
+
+  .panel {
+    padding: 17px;
+  }
+
+  .submit-row {
+    margin-right: -17px;
+    margin-left: -17px;
+    padding-right: 17px;
+    padding-left: 17px;
+  }
+}
+
+@media (max-width: 768px) {
+  .panel {
+    backdrop-filter: blur(8px);
+  }
+
+  .hero-visual {
+    perspective: none;
+  }
+
+  body::after {
+    filter: blur(18px);
+    animation-duration: 36s;
+  }
+}
+
+@media (max-width: 480px) {
+  .effects-toggle {
+    font-size: inherit !important;
+  }
+}

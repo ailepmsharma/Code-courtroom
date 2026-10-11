@@ -1,0 +1,64 @@
+.courtroom-cast {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  margin: 0 0 22px;
+  border-block: 1px solid var(--border);
+  background: var(--border);
+}
+
+.cast-character {
+  display: grid;
+  min-width: 0;
+  gap: 8px;
+  padding: 16px;
+  background: var(--surface);
+  opacity: 0.3;
+  transition: opacity 240ms ease, background 240ms ease;
+}
+
+.cast-character.is-active {
+  background: var(--surface-strong);
+  opacity: 1;
+}
+
+.cast-character.prosecutor { --role-color: var(--danger); }
+.cast-character.defense { --role-color: var(--accent); }
+.cast-character.judge { --role-color: var(--paper); }
+
+.cast-label {
+  color: var(--role-color);
+  font: 500 0.7rem var(--font-mono);
+  letter-spacing: 0.1em;
+}
+
+.cast-character strong {
+  color: var(--paper);
+  font-size: 1rem;
+}
+
+.cast-waveform {
+  display: flex;
+  height: 22px;
+  align-items: center;
+  gap: 3px;
+}
+
+.cast-waveform i {
+  width: 2px;
+  height: 4px;
+  background: var(--role-color);
+  animation: waveform 620ms ease-in-out infinite alternate;
+}
+
+.cast-waveform i:nth-child(2n) { animation-delay: -230ms; }
+.cast-waveform i:nth-child(3n) { animation-delay: -410ms; }
+.cast-character:not(.is-active) .cast-waveform i { animation-name: flatline; }
+
+@media (max-width: 600px) {
+  .courtroom-cast { grid-template-columns: 1fr; }
+  .cast-character { grid-template-columns: 1fr auto; align-items: center; }
+  .cast-label { grid-column: 1; }
+  .cast-character strong { grid-column: 1; }
+  .cast-waveform { grid-column: 2; grid-row: 1 / span 2; }
+}

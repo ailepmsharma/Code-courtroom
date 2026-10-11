@@ -1,129 +1,219 @@
-const simulateAnalysis = (code) => {
-  if (!code || !code.trim()) {
-    return {
-      success: false,
-      error: 'Add some code before you put it on trial',
-    }
-  }
+const validSides = new Set(['prosecutor', 'defense', 'judge'])
 
-  const hasKnownCartFlow = /\bcart\s*=\s*\[\s*\]/.test(code) && /\bcheckout\s*\(/.test(code)
-  const isBuggy = hasKnownCartFlow && (
-    /(?:^|[;{}\n])\s*cart\s*=\s*\[\]/.test(code) || /return\s+cart\b/.test(code)
-  )
+const isRecord = (value) => Boolean(value) && typeof value === 'object' && !Array.isArray(value)
 
-  const evidence = [
-    {
-      line: 3,
-      label: 'State mutation during checkout',
-      description:
-        'The cart array is reassigned directly inside checkout(), which mutates the shared object reference and can clear state unexpectedly during purchase handling.',
-      severity: 'Critical',
-      confidence: 96,
-    },
-    {
-      line: 8,
-      label: 'Return value exposes mutable state',
-      description:
-        'The function returns the original cart reference instead of a defensive copy, allowing external callers to mutate the same instance.',
-      severity: 'Major',
-      confidence: 89,
-    },
-  ]
+const safeText = (value) => (
+  typeof value === 'string' && value.trim().length > 0 ? value : null
+)
 
-  const transcript = isBuggy ? [
-    {
-      speaker: 'Prosecutor',
-      side: 'prosecutor',
-      text:
-        'The checkout routine reassigns the cart array instead of resetting state safely. That creates a mutable reference leak and can wipe the user session mid-flow.',
-    },
-    {
-      speaker: 'Defense',
-      side: 'defense',
-      text:
-        'The mutation is isolated to the reset step, but the original array object is still being exposed outside the function boundary.',
-    },
-    {
-      speaker: 'Judge',
-      side: 'judge',
-      text:
-        'This is a clear state-management issue. The ruling favors a defensive clone and a reset that does not mutate shared references.',
-    },
-  ] : hasKnownCartFlow ? [
-    {
-      speaker: 'Prosecutor',
-      side: 'prosecutor',
-      text:
-        'The checkout flow takes a defensive copy before clearing the cart, preserving the live collection for other callers.',
-    },
-    {
-      speaker: 'Defense',
-      side: 'defense',
-      text:
-        'The empty-cart guard and copied order snapshot keep the checkout path predictable without exposing shared state.',
-    },
-    {
-      speaker: 'Judge',
-      side: 'judge',
-      text:
-        'No critical state leak is apparent in this sample. The defensive copy keeps the cart boundary intact through checkout.',
-    },
-  ] : [
-    {
-      speaker: 'Prosecutor',
-      side: 'prosecutor',
-      text:
-        'This local demo only examines one known cart-checkout pattern, so it cannot substantiate a charge against this snippet.',
-    },
-    {
-      speaker: 'Defense',
-      side: 'defense',
-      text:
-        'Without a connected analysis service or a recognized cart flow, the code should not be treated as cleared.',
-    },
-    {
-      speaker: 'Judge',
-      side: 'judge',
-      text:
-        'No automated conclusion is available. Use a curated cart sample to see the local demo rules in action.',
-    },
-  ]
+const normalizeItems = (value) => {
+  if (!Array.isArray(value)) return []
 
-  const verdict = {
-    status: isBuggy ? 'Issue found' : hasKnownCartFlow ? 'No critical issues' : 'Limited demo',
-    resultType: isBuggy ? 'issue' : hasKnownCartFlow ? 'clear' : 'review',
-    score: hasKnownCartFlow ? (isBuggy ? 92 : 87) : null,
-    verdict: isBuggy
-      ? 'Needs patch before release'
-      : hasKnownCartFlow
-        ? 'Approved with minor cleanup'
-        : 'No automated conclusion',
-    summary: isBuggy
-      ? 'The cart is mutated by reassigning the array reference inside checkout(), which can silently clear user state and break the purchase flow.'
-      : hasKnownCartFlow
-        ? 'The submitted logic is structurally sound and avoids destructive state mutation during cleanup.'
-        : 'This prototype uses local rules for a curated cart-checkout example. No AI model or backend is connected to review arbitrary code.',
-    recommendation: isBuggy
-      ? 'Clone the current cart before reset and return a new array instead of mutating the original reference in place.'
-      : hasKnownCartFlow
-        ? 'Keep the defensive reset pattern and document the state boundary so future changes do not reintroduce shared-reference bugs.'
-        : 'Try the buggy or clean cart sample to explore the demo, and do not use this result as a production security review.',
-    detected: isBuggy ? 'State mutation' : hasKnownCartFlow ? 'No critical findings' : 'Not assessed',
-    impact: isBuggy ? 'Checkout breakage' : hasKnownCartFlow ? 'No release blocker' : 'Unknown',
-  }
+  return value.filter(isRecord).map((item) => ({
+    title: safeText(item.title ?? item.label) ?? 'Unspecified finding',
+    description: safeText(item.description ?? item.detail ?? item.text) ?? 'No further detail was provided.',
+    severity: safeText(item.severity) ?? 'Minor',
+    line: Number.isInteger(item.line) && item.line > 0 ? item.line : null,
+  }))
+}
+
+export const normalizeTrialEntry = (entry) => {
+  if (!isRecord(entry) || !validSides.has(entry.side)) return null
+
+  const openingStatement = safeText(entry.opening_statement)
+  const text = safeText(entry.text)
+  const argumentItems = normalizeItems(entry.side === 'defense'
+    ? entry.defenses ?? entry.charges
+    : entry.charges ?? entry.defenses)
 
   return {
-    success: true,
-    evidence: isBuggy ? evidence : [],
-    transcript,
-    verdict,
+    speaker: safeText(entry.speaker) ?? (entry.side === 'judge' ? 'Judge' : entry.side),
+    side: entry.side,
+    opening_statement: openingStatement ?? (!text ? 'The court reporter could not make out this part of the argument.' : null),
+    text,
+    ...(entry.side === 'prosecutor' ? { charges: argumentItems } : {}),
+    ...(entry.side === 'defense' ? { defenses: argumentItems } : {}),
+    closing_statement: safeText(entry.closing_statement),
   }
 }
 
-export const analyzeCase = async (code, languageHint = { language: 'auto', detected: false }) => {
-  await new Promise((resolve) => setTimeout(resolve, 800))
-  return {
-    ...simulateAnalysis(code),
-    languageHint,
+const normalizeEvidence = (value) => (
+  Array.isArray(value)
+    ? value.filter(isRecord).map((item) => ({
+        line: Number.isInteger(item.line) && item.line > 0 ? item.line : null,
+        label: safeText(item.label) ?? 'Unspecified finding',
+        description: safeText(item.description) ?? 'No further detail was provided.',
+        severity: safeText(item.severity) ?? 'Minor',
+        confidence: Number.isFinite(item.confidence) ? item.confidence : null,
+      }))
+    : []
+)
+
+const yieldToPaint = () => (
+  typeof requestAnimationFrame === 'function'
+    ? new Promise((resolve) => requestAnimationFrame(resolve))
+    : Promise.resolve()
+)
+
+export class TrialApiError extends Error {
+  constructor(message, stage = 'prosecution', cause) {
+    super(message, { cause })
+    this.name = 'TrialApiError'
+    this.stage = ['prosecution', 'defense', 'verdict'].includes(stage) ? stage : 'prosecution'
   }
+}
+
+export const normalizeTrialData = (payload, languageHint) => {
+  if (!isRecord(payload) || payload.success !== true || !Array.isArray(payload.transcript) || !isRecord(payload.verdict)) {
+    throw new TrialApiError('The court reporter could not make out the trial response. Please retry.', 'verdict')
+  }
+
+  const transcript = payload.transcript.map(normalizeTrialEntry).filter(Boolean)
+  const verdictText = safeText(payload.verdict.verdict)
+
+  if (!verdictText || transcript.length === 0) {
+    throw new TrialApiError('The court reporter could not make out the trial response. Please retry.', 'verdict')
+  }
+
+  const resultType = ['issue', 'clear', 'review'].includes(payload.verdict.resultType)
+    ? payload.verdict.resultType
+    : 'review'
+
+  return {
+    success: true,
+    transcript,
+    evidence: normalizeEvidence(payload.evidence),
+    verdict: {
+      status: safeText(payload.verdict.status) ?? 'Ruling',
+      resultType,
+      score: Number.isFinite(payload.verdict.score) ? payload.verdict.score : null,
+      verdict: verdictText,
+      summary: safeText(payload.verdict.summary),
+      reasoning: safeText(payload.verdict.reasoning),
+      recommendation: safeText(payload.verdict.recommendation),
+      detected: safeText(payload.verdict.detected),
+      impact: safeText(payload.verdict.impact),
+      sentence: Array.isArray(payload.verdict.sentence)
+        ? payload.verdict.sentence.map(safeText).filter(Boolean)
+        : [],
+    },
+    languageHint: isRecord(payload.languageHint) ? payload.languageHint : languageHint,
+  }
+}
+
+const readTrialStream = async (response, onProgress) => {
+  const reader = response.body?.getReader()
+  if (!reader) {
+    throw new TrialApiError('The court returned an unreadable response. Please retry the trial.', 'verdict')
+  }
+
+  const decoder = new TextDecoder()
+  let buffer = ''
+  let result = null
+
+  const consumeLine = async (line) => {
+    if (!line.trim()) return
+
+    let event
+    try {
+      event = JSON.parse(line)
+    } catch (error) {
+      throw new TrialApiError('The court returned an unreadable response. Please retry the trial.', 'verdict', error)
+    }
+
+    if (event.type === 'progress') {
+      const stage = ['prosecution', 'defense', 'verdict'].includes(event.stage) ? event.stage : null
+      const status = ['active', 'complete', 'error'].includes(event.status) ? event.status : null
+      if (!stage || !status) {
+        throw new TrialApiError('The court reporter could not make out the trial progress. Please retry.', event.stage)
+      }
+
+      const entry = event.entry ? normalizeTrialEntry(event.entry) : null
+      if (event.entry && !entry) {
+        throw new TrialApiError('The court reporter could not make out this part of the argument. Please retry.', stage)
+      }
+
+      onProgress?.({
+        stage,
+        status,
+        entry,
+        evidence: event.evidence ? normalizeEvidence(event.evidence) : undefined,
+      })
+      await yieldToPaint()
+      return
+    }
+
+    if (event.type === 'error') {
+      throw new TrialApiError(
+        safeText(event.error) ?? 'The court could not complete this review. Please retry.',
+        event.stage,
+      )
+    }
+
+    if (event.type === 'result') result = event.result
+  }
+
+  while (true) {
+    const { done, value } = await reader.read()
+    buffer += decoder.decode(value ?? new Uint8Array(), { stream: !done })
+    const lines = buffer.split(/\r?\n/)
+    buffer = lines.pop() ?? ''
+    for (const line of lines) {
+      await consumeLine(line)
+    }
+
+    if (done) break
+  }
+
+  await consumeLine(buffer)
+  if (!result) {
+    throw new TrialApiError('The court reporter lost connection before the ruling. Please retry.', 'verdict')
+  }
+  return result
+}
+
+export const analyzeCase = async (
+  code,
+  languageHint = { language: 'auto', detected: false },
+  { signal, onProgress } = {},
+) => {
+  let response
+
+  try {
+    response = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/x-ndjson, application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ code, languageHint }),
+      signal,
+    })
+  } catch (error) {
+    if (error.name === 'AbortError') throw error
+    throw new TrialApiError('The court reporter lost connection. Please retry the trial.', 'prosecution', error)
+  }
+
+  let payload
+  if (response.headers.get('content-type')?.includes('application/x-ndjson')) {
+    if (!response.ok) {
+      throw new TrialApiError('The court could not complete this review. Please retry.', 'prosecution')
+    }
+    payload = await readTrialStream(response, onProgress)
+  } else {
+    try {
+      payload = await response.json()
+    } catch (error) {
+      throw new TrialApiError('The court returned an unreadable response. Please retry the trial.', 'verdict', error)
+    }
+
+    if (!response.ok || payload?.success === false) {
+      throw new TrialApiError(
+        safeText(payload?.error) ?? 'The court could not complete this review. Please retry.',
+        payload?.stage,
+      )
+    }
+  }
+
+  return normalizeTrialData(payload, languageHint)
 }

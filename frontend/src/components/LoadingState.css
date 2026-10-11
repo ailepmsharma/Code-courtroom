@@ -1,0 +1,29 @@
+.loading-state {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 4px;
+}
+
+.loading-state strong {
+  display: block;
+  margin: 3px 0;
+}
+
+.loading-state p {
+  color: var(--color-text-muted);
+}
+
+.loading-kicker {
+  color: var(--judge-text);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.loading-dots {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  animation: dots 1s steps(4, end) infinite;
+}
