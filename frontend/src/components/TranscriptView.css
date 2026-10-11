@@ -1,0 +1,109 @@
+.court-session-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 34px;
+  margin-bottom: 14px;
+  padding: 6px 12px;
+  border: 1px solid var(--prosecutor);
+  border-radius: 999px;
+  background: var(--prosecutor-soft);
+  color: var(--prosecutor-text);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.heartbeat {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--prosecutor);
+  box-shadow: 0 0 0 0 var(--prosecutor-soft);
+  animation: heart-pulse 1.3s ease-out infinite;
+}
+
+.court-session-badge.is-deliberating .heartbeat {
+  animation-duration: 0.55s;
+}
+
+.transcript-role-tabs {
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
+  gap: 6px;
+  margin: 0 0 20px;
+  padding: 4px;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-soft);
+}
+
+.transcript-role-tab {
+  flex: 0 0 auto;
+  padding: 0 14px;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-muted);
+}
+
+.transcript-role-tab.is-active {
+  background: var(--accent-soft);
+  color: var(--color-text);
+}
+
+.transcript-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.tension-line {
+  display: block;
+  width: 100%;
+  height: 48px;
+  margin: 8px 0 18px;
+  overflow: visible;
+  color: var(--accent);
+  opacity: 0.74;
+}
+
+.tension-line path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 740;
+  animation: tension-trace 2.1s linear infinite;
+}
+
+.tension-defense path { animation-duration: 1.35s; }
+.tension-judge path { animation-duration: 760ms; }
+
+@keyframes tension-trace {
+  from { stroke-dashoffset: 740; }
+  to { stroke-dashoffset: 0; }
+}
+
+.sound-toggle {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--surface-soft);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.typewriter-caret {
+  display: inline-block;
+  margin-left: 2px;
+  color: var(--judge);
+  animation: typewriter-blink 0.7s steps(2, start) infinite;
+}
+
+@keyframes typewriter-blink {
+  to { visibility: hidden; }
+}

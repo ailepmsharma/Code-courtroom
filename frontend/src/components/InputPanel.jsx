@@ -1,17 +1,24 @@
 import { useEffect, useRef, useState } from 'react'
 import { detectLanguage, languageOptions } from '../data/languages.js'
+import { editorPlaceholder } from '../data/reviewCopy.js'
 
-const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, isValid, overLimit, textareaRef, language, onLanguageChange }) => {
+const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, isTypingSample = false, isValid, overLimit, textareaRef, language, onLanguageChange, selectedLine }) => {
   const [copyFeedback, setCopyFeedback] = useState('')
   const [showEmptyHint, setShowEmptyHint] = useState(true)
   const [attemptFeedback, setAttemptFeedback] = useState('')
   const [sampleFeedback, setSampleFeedback] = useState('')
   const [sampleHighlight, setSampleHighlight] = useState('')
   const [submitFeedback, setSubmitFeedback] = useState('')
+  const [contemptBadge, setContemptBadge] = useState(false)
+  const [fullscreenEditor, setFullscreenEditor] = useState(false)
+  const [scanLine, setScanLine] = useState(0)
   const attemptTimeoutRef = useRef(null)
   const sampleFeedbackTimeoutRef = useRef(null)
   const submitFeedbackTimeoutRef = useRef(null)
+  const gutterRef = useRef(null)
+  const highlightRef = useRef(null)
   const lineCount = code.trim() ? code.split(/\r\n|\r|\n/).length : 0
+  const visibleLineCount = Math.max(1, lineCount)
   const detectedLanguage = detectLanguage(code)
   const selectedLanguage = languageOptions.find((option) => option.value === language) ?? languageOptions[0]
   const languageStatus = language === 'auto'
@@ -24,12 +31,30 @@ const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, 
     window.clearTimeout(submitFeedbackTimeoutRef.current)
   }, [])
 
+  useEffect(() => {
+    if (!isSubmitting) return undefined
+    const timer = window.setInterval(() => {
+      setScanLine((line) => Math.min(lineCount, line + 1))
+    }, 110)
+    return () => window.clearInterval(timer)
+  }, [isSubmitting, lineCount])
+
+  useEffect(() => {
+    if (!fullscreenEditor) return undefined
+    const closeOnEscape = (event) => {
+      if (event.key === 'Escape') setFullscreenEditor(false)
+    }
+    window.addEventListener('keydown', closeOnEscape)
+    return () => window.removeEventListener('keydown', closeOnEscape)
+  }, [fullscreenEditor])
+
   const handleEmptyAttempt = () => {
     if (isValid || isSubmitting) {
       return
     }
 
     setShowEmptyHint(true)
+    setContemptBadge(true)
     setAttemptFeedback((current) => (current === 'attempt-a' ? 'attempt-b' : 'attempt-a'))
     window.clearTimeout(attemptTimeoutRef.current)
     attemptTimeoutRef.current = window.setTimeout(() => setAttemptFeedback(''), 280)
@@ -38,11 +63,13 @@ const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, 
   const handleFormSubmit = (event) => {
     event.preventDefault()
 
+    if (isTypingSample) return
     if (!isValid || isSubmitting) {
       handleEmptyAttempt()
       return
     }
 
+    setScanLine(0)
     onSubmit()
   }
 
@@ -60,7 +87,7 @@ const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, 
     setCopyFeedback('')
     setShowEmptyHint(false)
     setSampleHighlight(variant)
-    setSampleFeedback(variant === 'buggy' ? 'Buggy sample loaded' : 'Clean sample loaded')
+    setSampleFeedback(`${variant === 'buggy' ? 'Buggy sample' : 'Clean sample'} loaded`)
     window.clearTimeout(sampleFeedbackTimeoutRef.current)
     sampleFeedbackTimeoutRef.current = window.setTimeout(() => {
       setSampleFeedback('')
@@ -80,15 +107,32 @@ const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, 
     submitFeedbackTimeoutRef.current = window.setTimeout(() => setSubmitFeedback(''), 240)
   }
 
+  const handleEditorScroll = (event) => {
+    if (gutterRef.current) gutterRef.current.scrollTop = event.currentTarget.scrollTop
+    if (highlightRef.current) {
+      highlightRef.current.scrollLeft = event.currentTarget.scrollLeft
+      highlightRef.current.scrollTop = event.currentTarget.scrollTop
+    }
+  }
+
+  const highlightedCode = code.split(/(\b(?:const|let|var|function|return|if|else|new|class|async|await|throw|try|catch|true|false|null|undefined)\b|\/\/[^\n]*|\/\*[\s\S]*?\*\/|'(?:\\.|[^'\\])*'|"(?:\\.|[^"\\])*"|`(?:\\.|[^`\\])*`|\b\d+(?:\.\d+)?\b)/g)
+    .map((part, index) => {
+      let tokenClass = ''
+      if (/^\/\//.test(part) || /^\/\*/.test(part)) tokenClass = 'syntax-comment'
+      else if (/^['"`]/.test(part)) tokenClass = 'syntax-string'
+      else if (/^(const|let|var|function|return|if|else|new|class|async|await|throw|try|catch|true|false|null|undefined)$/.test(part)) tokenClass = 'syntax-keyword'
+      else if (/^\d/.test(part)) tokenClass = 'syntax-number'
+      return tokenClass ? <span className={tokenClass} key={index}>{part}</span> : part
+    })
+
   return (
     <form
-      className="panel input-panel"
+      className={`panel input-panel ${isSubmitting ? 'is-scanning' : ''}`}
       onSubmit={handleFormSubmit}
     >
       <div className="section-header-row">
         <div>
-          <div className="eyebrow subtle">Evidence file · 01</div>
-          <h2>Code evidence</h2>
+          <h2>Code input</h2>
         </div>
         <div className="language-control">
           <label className="language-control-label" htmlFor="language-select">Review language</label>
@@ -97,7 +141,7 @@ const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, 
             className="language-select"
             value={language}
             onChange={(event) => onLanguageChange(event.target.value)}
-            disabled={isSubmitting}
+            disabled={isSubmitting || isTypingSample}
           >
             {languageOptions.map((option) => (
               <option key={option.value} value={option.value}>{option.label}</option>
@@ -107,54 +151,78 @@ const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, 
       </div>
 
       <div className="quick-samples" aria-label="Sample code quick-fill options">
-        <button type="button" className="sample-button" onClick={() => handleSampleLoad('buggy')} disabled={isSubmitting}>
-          <span className="sample-glyph" aria-hidden="true">🐛</span>
-          <span>Try Buggy Code</span>
+        <button type="button" className="sample-button" onClick={() => handleSampleLoad('buggy')} disabled={isSubmitting || isTypingSample}>
+          <span>Buggy sample</span>
         </button>
-        <button type="button" className="sample-button" onClick={() => handleSampleLoad('clean')} disabled={isSubmitting}>
-          <span className="sample-glyph" aria-hidden="true">✨</span>
-          <span>Try Clean Code</span>
+        <button type="button" className="sample-button" onClick={() => handleSampleLoad('clean')} disabled={isSubmitting || isTypingSample}>
+          <span>Clean sample</span>
         </button>
       </div>
 
-      <div className={`code-workbench ${sampleHighlight ? 'sample-loaded' : ''}`}>
+      <div className={`code-workbench ${sampleHighlight ? 'sample-loaded' : ''} ${fullscreenEditor ? 'is-fullscreen' : ''}`}>
         <div className="code-toolbar">
           <div className="editor-heading">
             <span className="editor-led" aria-hidden="true" />
-            <label htmlFor="code-input" className="editor-label">Exhibit A · Source code</label>
-            <span className="language-status" aria-live="polite">Language · {languageStatus}</span>
+            <label htmlFor="code-input" className="editor-label">Your code</label>
+            <span className="language-status" aria-live="polite">{languageStatus}</span>
           </div>
-          <button type="button" className="copy-button" onClick={handleCopy} disabled={!isValid || isSubmitting} aria-live="polite">
+          <button type="button" className="copy-button" onClick={handleCopy} disabled={!isValid || isSubmitting || isTypingSample} aria-live="polite">
             {copyFeedback || 'Copy code'}
           </button>
+          <button
+            type="button"
+            className="fullscreen-button"
+            onClick={() => setFullscreenEditor((current) => !current)}
+            aria-pressed={fullscreenEditor}
+          >
+            {fullscreenEditor ? 'Close editor' : 'Fullscreen'}
+          </button>
         </div>
-        <textarea
-          ref={textareaRef}
-          id="code-input"
-          className="code-input"
-          value={code}
-          onChange={(event) => {
-            onCodeChange(event.target.value)
-            setCopyFeedback('')
-            setShowEmptyHint(!event.target.value.trim())
-          }}
-          onFocus={() => {
-            if (!isValid) {
-              setShowEmptyHint(true)
-            }
-          }}
-          placeholder="// Paste the code you'd like to put on trial…"
-          aria-describedby="code-help code-count code-empty-hint"
-          aria-invalid={showEmptyHint && !isValid}
-          spellCheck="false"
-          disabled={isSubmitting}
-        />
+        <div className="code-editor-row">
+          <pre ref={gutterRef} className="line-gutter" aria-hidden="true">{Array.from({ length: visibleLineCount }, (_, index) => index + 1).join('\n')}</pre>
+          <div className="code-input-stack">
+            <pre ref={highlightRef} className={`code-highlight ${code ? '' : 'is-empty'}`} aria-hidden="true">
+              {selectedLine && selectedLine <= visibleLineCount && (
+                <span
+                  className="selected-code-line"
+                  style={{ top: `${18 + (selectedLine - 1) * 26.4}px` }}
+                />
+              )}
+              {code ? highlightedCode : <span className="syntax-placeholder">// {editorPlaceholder}</span>}
+            </pre>
+            <textarea
+              ref={textareaRef}
+              id="code-input"
+              className="code-input"
+              value={code}
+              onScroll={handleEditorScroll}
+              onChange={(event) => {
+                onCodeChange(event.target.value)
+                setCopyFeedback('')
+                setShowEmptyHint(!event.target.value.trim())
+                if (event.target.value.trim()) setContemptBadge(false)
+              }}
+              onFocus={() => {
+                if (!isValid) {
+                  setShowEmptyHint(true)
+                }
+              }}
+              placeholder={editorPlaceholder}
+              aria-describedby="code-help code-count code-empty-hint"
+              aria-invalid={showEmptyHint && !isValid}
+              spellCheck="false"
+              disabled={isSubmitting || isTypingSample}
+            />
+          </div>
+        </div>
         <div className="code-footer">
           <span className="sample-feedback" role="status" aria-live="polite" aria-atomic="true">
             {sampleFeedback}
           </span>
           <div id="code-count" className={`counter ${overLimit ? 'warning' : ''}`}>
-            {lineCount} {lineCount === 1 ? 'line' : 'lines'} · {code.length} chars
+            {isSubmitting
+              ? `${scanLine} / ${lineCount} lines`
+              : `${lineCount} ${lineCount === 1 ? 'line' : 'lines'} · ${code.length} chars`}
           </div>
         </div>
       </div>
@@ -171,8 +239,11 @@ const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, 
           aria-live="polite"
           aria-hidden={!showEmptyHint || isValid}
         >
-          Add some code before you put it on trial
+          {!isValid ? 'Code required before review.' : ''}
         </div>
+        {contemptBadge && !isValid && (
+          <span className="contempt-badge" role="status">CONTEMPT OF CODE · Empty evidence</span>
+        )}
       </div>
 
       {overLimit && (
@@ -185,8 +256,8 @@ const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, 
         <button
           type="submit"
           className={`primary-button ${attemptFeedback} ${submitFeedback}`}
-          disabled={!isValid || isSubmitting}
-          aria-disabled={!isValid || isSubmitting}
+          disabled={isSubmitting || isTypingSample}
+          aria-disabled={isSubmitting || isTypingSample}
           aria-describedby={!isValid ? 'code-empty-hint' : undefined}
           onFocus={() => {
             if (!isValid) {
@@ -195,10 +266,7 @@ const InputPanel = ({ code, onCodeChange, onSubmit, onLoadSample, isSubmitting, 
           }}
           onClick={handleSubmitClick}
         >
-          <svg className="trial-mark" viewBox="0 0 40 40" fill="none" aria-hidden="true" focusable="false">
-            <path d="M20 6v24M11 11h18M20 9l-8 13m8-13 8 13M8 22h8c-.5 3.2-2 5-4 5s-3.5-1.8-4-5Zm16 0h8c-.5 3.2-2 5-4 5s-3.5-1.8-4-5ZM14 33h12M17 30h6" />
-          </svg>
-          <span>{isSubmitting ? 'Reviewing evidence...' : 'Put It On Trial ⚖️'}</span>
+          <span>{isSubmitting ? 'Reviewing code...' : isTypingSample ? 'Loading sample...' : 'Begin trial'}</span>
         </button>
       </div>
     </form>

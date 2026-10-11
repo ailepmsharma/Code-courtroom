@@ -1,0 +1,54 @@
+.trial-progress {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0 0 22px;
+  padding: 0;
+  list-style: none;
+}
+
+.trial-progress-step {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-soft);
+}
+
+.trial-progress-step.is-active {
+  border-color: var(--judge);
+  box-shadow: 0 0 20px var(--warning-soft);
+}
+
+.trial-progress-step.is-complete {
+  border-color: var(--success);
+}
+
+.trial-progress-step.is-error {
+  border-color: var(--danger);
+}
+
+.trial-progress-number,
+.trial-progress-status {
+  color: var(--color-text-muted);
+  font: 600 0.75rem/1.3 var(--font-mono);
+}
+
+.trial-progress-label {
+  font-weight: 700;
+}
+
+.trial-progress-status.status-active {
+  color: var(--judge);
+}
+
+.trial-progress-status.status-complete {
+  color: var(--success);
+}
+
+.trial-progress-status.status-error {
+  color: var(--danger);
+}

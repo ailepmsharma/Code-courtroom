@@ -1,11 +1,36 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+
+const TypewriterText = ({ text, className }) => {
+  const [visibleWords, setVisibleWords] = useState(0)
+  const shouldReduceMotion = document.documentElement.classList.contains('reduce-effects')
+  const words = text.match(/\S+\s*/g) ?? []
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setVisibleWords((current) => {
+        const next = Math.min(words.length, current + 1)
+        if (next === words.length) window.clearInterval(timer)
+        return next
+      })
+    }, shouldReduceMotion ? 35 : 90)
+    return () => window.clearInterval(timer)
+  }, [shouldReduceMotion, text, words.length])
+
+  return (
+    <p className={className} aria-label={text}>
+      {words.slice(0, visibleWords).map((word, index) => (
+        <span className={`argument-word ${index === visibleWords - 1 ? 'is-current' : ''}`} key={`${index}-${word}`}>{word}</span>
+      ))}
+      {visibleWords < words.length && <span className="typewriter-caret" aria-hidden="true">▍</span>}
+    </p>
+  )
+}
 
 const ChatBubble = ({ speaker, side, text, entry }) => {
   const payload = entry ?? { speaker, side, text }
   const isProsecutor = payload.side === 'prosecutor'
   const isDefense = payload.side === 'defense'
   const roleLabel = isProsecutor ? 'PROSECUTOR' : isDefense ? 'DEFENSE ATTORNEY' : 'THE JUDGE'
-  const avatar = isProsecutor ? '😈' : isDefense ? '😇' : '⚖️'
   const caption = isProsecutor ? 'For the state' : isDefense ? 'For the defense' : 'Court record'
   const [expanded, setExpanded] = useState({})
   const severityRank = { critical: 0, major: 1, minor: 2 }
@@ -23,7 +48,7 @@ const ChatBubble = ({ speaker, side, text, entry }) => {
   return (
     <article className={`speech-bubble ${payload.side}`} aria-label={`${payload.speaker ?? speaker} statement`}>
       <div className="speaker-row">
-        <span className={`speaker-avatar ${payload.side}`} aria-hidden="true">{avatar}</span>
+        <span className={`speaker-channel-mark ${payload.side}`} aria-hidden="true" />
         <div className="speaker-meta">
           <span className="speaker-tag">{roleLabel}</span>
           <small>{caption}</small>
@@ -31,10 +56,10 @@ const ChatBubble = ({ speaker, side, text, entry }) => {
       </div>
 
       {payload.opening_statement && (
-        <p className="opening-statement">{payload.opening_statement}</p>
+        <TypewriterText key={payload.opening_statement} className="opening-statement" text={payload.opening_statement} />
       )}
 
-      {payload.text && !payload.opening_statement && <p className="opening-statement">{payload.text}</p>}
+      {payload.text && !payload.opening_statement && <TypewriterText key={payload.text} className="opening-statement" text={payload.text} />}
 
       {items.length > 0 ? (
         <div className="argument-list" aria-label={`${payload.speaker ?? speaker} evidence`}>
@@ -78,9 +103,9 @@ const ChatBubble = ({ speaker, side, text, entry }) => {
       ) : null}
 
       {payload.closing_statement && (
-        <p className="closing-statement" style={{ '--argument-count': items.length }}>
-          {payload.closing_statement}
-        </p>
+        <div style={{ '--argument-count': items.length }}>
+          <TypewriterText key={payload.closing_statement} className="closing-statement" text={payload.closing_statement} />
+        </div>
       )}
     </article>
   )
